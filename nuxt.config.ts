@@ -2,9 +2,6 @@ import { fileURLToPath } from 'node:url';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
-
   modules: [
     '@nuxt/eslint',
     '@nuxtjs/google-fonts',
@@ -13,6 +10,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'shadcn-nuxt'
   ],
+  devtools: { enabled: true },
 
   app: {
     head: {
@@ -23,6 +21,10 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/tailwind.css'],
 
+  alias: {
+    '#data': fileURLToPath(new URL('./server/data', import.meta.url))
+  },
+  compatibilityDate: '2025-07-15',
 
   typescript: {
     strict: true,
@@ -54,4 +56,4 @@ export default defineNuxtConfig({
     prefix: '',
     componentDir: '@/components/ui'
   }
-})
+});
