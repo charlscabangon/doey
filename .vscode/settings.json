@@ -1,7 +1,8 @@
 {
-  "explorer.sortOrder":"default",
-  "explorer.fileNesting.enabled": true,
-  "explorer.fileNesting.patterns": {
-    "index.ts": "*.ts, *.vue",
-  }
+    "explorer.sortOrder":"default",
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "index.ts": "*.ts, *.vue",
+    },
+    "prettier.tabWidth": 4,
 }
