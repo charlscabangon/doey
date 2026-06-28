@@ -16,72 +16,58 @@ export const MESSAGES = {
             503: 'The service is down for maintenance. Check back soon.'
         },
 
-        auth: {
-            login: 'Invalid email or password.',
-            logout: 'Could not log you out. Please try again.',
-            register: 'Could not create your account. Please try again.',
-            refreshToken: 'Your session expired. Please sign in again.',
-            forgotPassword: 'Could not send the reset email. Please try again.',
-            resetPassword: 'Could not reset your password. The link may have expired.',
-            verifyEmail: 'Email verification failed. The link may be invalid or expired.',
-            unauthorized: 'You must be logged in to do that.'
-        },
-
-        user: {
-            fetch: 'Could not load user data.',
-            update: 'Could not update your profile.',
-            updateAvatar: 'Could not upload your photo.',
-            delete: 'Could not delete your account.',
-            changePassword: 'Could not change your password.'
-        },
-
-        posts: {
-            fetch: 'Could not load posts.',
-            fetchOne: 'Could not load the post.',
-            create: 'Could not create the post.',
-            update: 'Could not update the post.',
-            delete: 'Could not delete the post.'
-        },
-
-        form: {
-            required: 'Please fill in all required fields.',
-            invalidEmail: 'Please enter a valid email address.',
-            passwordMatch: 'Passwords do not match.',
-            fileTooLarge: 'The file is too large. Maximum size is 5MB.',
-            invalidFormat: 'The file format is not supported.'
-        },
-
         network: {
             offline: 'You appear to be offline. Check your connection.',
             timeout: 'The request took too long. Please try again.',
             aborted: 'The request was cancelled.'
+        },
+
+        project: {
+            fetch: 'Could not load projects.',
+            fetchOne: 'Could not load the project.',
+            create: 'Could not create the project.',
+            update: 'Could not update the project.',
+            delete: 'Could not delete the project.'
+        },
+
+        task: {
+            fetch: 'Could not load tasks.',
+            fetchOne: 'Could not load the task.',
+            create: 'Could not create the task.',
+            update: 'Could not update the task.',
+            delete: 'Could not delete the task.',
+            assign: 'Could not assign the user to this task.',
+            reorder: 'Could not update task order.'
+        },
+
+        user: {
+            fetch: 'Could not load users.',
+            create: 'Could not create the user.',
+            update: 'Could not update the user.',
+            delete: 'Could not delete the user.'
         }
     },
 
     success: {
-        auth: {
-            login: 'Welcome back!',
-            logout: 'You have been signed out.',
-            register: 'Account created! Welcome aboard.',
-            forgotPassword: 'Reset email sent. Check your inbox.',
-            resetPassword: 'Password reset successfully.',
-            verifyEmail: 'Email verified successfully.'
+        project: {
+            create: 'Project created successfully.',
+            update: 'Project updated successfully.',
+            delete: 'Project deleted.'
+        },
+
+        task: {
+            create: 'Task created successfully.',
+            update: 'Task updated successfully.',
+            delete: 'Task deleted.',
+            assign: 'User assigned to task.'
         },
 
         user: {
-            update: 'Profile updated successfully.',
-            updateAvatar: 'Photo uploaded successfully.',
-            delete: 'Account deleted.',
-            changePassword: 'Password changed successfully.'
-        },
-
-        posts: {
-            create: 'Post created successfully.',
-            update: 'Post updated successfully.',
-            delete: 'Post deleted.'
+            create: 'User created successfully.',
+            update: 'User updated successfully.',
+            delete: 'User deleted.'
         }
     }
-    // add new domains as needed
 } as const;
 
 /* ----------------------------------------------------------
