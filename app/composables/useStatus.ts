@@ -36,10 +36,10 @@ export function useStatus(scopedKey?: StatusKey) {
     /* ----------------------------------------------------------
         CORE
         ---------------------------------------------------------- */
-    async function run<T>(
+    const run = async <T>(
         fn: (signal?: AbortSignal) => Promise<T>,
         options: RunOptions = {}
-    ): Promise<T | null> {
+    ): Promise<T | null> => {
         const opKey = options.key ?? scopedKey ?? 'global';
         const minMs = options.minLoadingMs ?? 0;
         const ac = new AbortController();
@@ -77,18 +77,18 @@ export function useStatus(scopedKey?: StatusKey) {
             if (options.rethrow) throw err;
             return null;
         }
-    }
+    };
 
     /* ----------------------------------------------------------
         TYPED MESSAGE HELPERS
         ---------------------------------------------------------- */
-    function setSuccessFromKey(msgKey: SuccessMessageKey, key?: StatusKey, autoClearMs?: number) {
+    const setSuccessFromKey = (msgKey: SuccessMessageKey, key?: StatusKey, autoClearMs?: number) => {
         store.setSuccess(key ?? scopedKey ?? 'global', resolveSuccessMessage(msgKey), autoClearMs);
-    }
+    };
 
-    function setErrorFromKey(msgKey: ErrorMessageKey, key?: StatusKey) {
+    const setErrorFromKey = (msgKey: ErrorMessageKey, key?: StatusKey) => {
         store.setError(key ?? scopedKey ?? 'global', resolveErrorMessage(msgKey));
-    }
+    };
 
     /* ----------------------------------------------------------
         MANUAL CONTROL

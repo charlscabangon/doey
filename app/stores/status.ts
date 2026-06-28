@@ -1,112 +1,127 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-
-export type StatusKey = string;
-
-export interface StatusMessage {
-    message: string;
-    details?: string;
-    timestamp: number;
-};
+import type { StatusKey, LoadingEntry, ErrorEntry, SuccessEntry } from '@/types/status';
 
 export const useStatusStore = defineStore('status', () => {
-    // states
-    const loadingKeys = ref<Set<StatusKey>>(new Set());
-    const errors = ref<Map<StatusKey, StatusMessage>>(new Map());
-    const successes = ref<Map<StatusKey, StatusMessage>>(new Map());
+    /* ----------------------------------------------------------
+        STATES
+        ---------------------------------------------------------- */
+    const loading = ref<Record<string, LoadingEntry>>({});
+    const errors = ref<Record<string, ErrorEntry>>({});
+    const successes = ref<Record<string, SuccessEntry>>({});
 
-    // getters
-    const isAnyLoading = computed(() => loadingKeys.value.size > 0);
-    const loadingList = computed(() => [...loadingKeys.value]);
-    const errorList = computed(() =>
-        [...errors.value.entries()].map(([key, val]) => ({ key, ...val })));
-    const successList = computed(() =>
-        [...successes.value.entries()].map(([key, val]) => ({ key, ...val })));
-    const latestError = computed(() =>
-        errorList.value.sort((a, b) => b.timestamp - a.timestamp)[0] ?? null
-    );
-    const latestSuccess = computed(() =>
-        successList.value.sort((a, b) => b.timestamp - a.timestamp)[0] ?? null
+    /* ----------------------------------------------------------
+        GETTERS
+        ---------------------------------------------------------- */
+    const isAnyLoading = computed(() => Object.keys(loading.value).length > 0);
+
+    const errorList = computed<ErrorEntry[]>(() =>
+        Object.values(errors.value).sort((a, b) => b.timestamp - a.timestamp)
     );
 
-    // actions
-    function startLoading(key: StatusKey) {
-    // trigger reactivity: replace the Set reference
-        const next = new Set(loadingKeys.value);
-        next.add(key);
-        loadingKeys.value = next;
-        // clear previous error/success for this key when retrying
+    const successList = computed<SuccessEntry[]>(() =>
+        Object.values(successes.value).sort((a, b) => b.timestamp - a.timestamp)
+    );
+
+    const latestError = computed<ErrorEntry | null>(() =>
+        errorList.value[0] ?? null
+    );
+
+    const latestSuccess = computed<SuccessEntry | null>(() =>
+        successList.value[0] ?? null
+    );
+
+    /* ----------------------------------------------------------
+        ACTIONS
+        ---------------------------------------------------------- */
+    const startLoading = (key: StatusKey, abortController?: AbortController) => {
+        loading.value[key] = { key, abortController, startedAt: Date.now() };
         clearError(key);
-    }
+        clearSuccess(key);
+    };
 
     function stopLoading(key: StatusKey) {
-        const next = new Set(loadingKeys.value);
-        next.delete(key);
-        loadingKeys.value = next;
+        Reflect.deleteProperty(loading.value, key);
     }
 
-    function isLoading(key: StatusKey) {
-        return loadingKeys.value.has(key);
-    }
-
-    function setError(key: StatusKey, message: string, details?: string) {
+    const cancelLoading = (key: StatusKey) => {
+        loading.value[key]?.abortController?.abort();
         stopLoading(key);
-        const next = new Map(errors.value);
-        next.set(key, { message, details, timestamp: Date.now() });
-        errors.value = next;
-    }
+    };
 
-    function clearError(key: StatusKey) {
-        if (!errors.value.has(key)) return;
-        const next = new Map(errors.value);
-        next.delete(key);
-        errors.value = next;
-    }
+    const isLoading = (key: StatusKey): boolean => {
+        return key in loading.value;
+    };
 
-    function clearAllErrors() {
-        errors.value = new Map();
-    }
+    const getError = (key: StatusKey): ErrorEntry | null => {
+        return errors.value[key] ?? null;
+    };
 
-    function setSuccess(key: StatusKey, message: string, autoClearMs = 3000) {
+    const getSuccess = (key: StatusKey): SuccessEntry | null => {
+        return successes.value[key] ?? null;
+    };
+
+    const setError = (key: StatusKey, message: string, cause?: unknown) => {
         stopLoading(key);
-        const next = new Map(successes.value);
-        next.set(key, { message, timestamp: Date.now() });
-        successes.value = next;
+        errors.value[key] = { key, message, cause, timestamp: Date.now() };
+    };
+
+    const clearError = (key: StatusKey) => {
+        Reflect.deleteProperty(errors.value, key);
+    };
+
+    const clearAllErrors = () => {
+        errors.value = {};
+    };
+
+    const setSuccess = (key: StatusKey, message: string, autoClearMs = 3000) => {
+        stopLoading(key);
+        successes.value[key] = { key, message, timestamp: Date.now() };
 
         if (autoClearMs > 0) {
             setTimeout(() => clearSuccess(key), autoClearMs);
         }
-    }
+    };
 
-    function clearSuccess(key: StatusKey) {
-        if (!successes.value.has(key)) return;
-        const next = new Map(successes.value);
-        next.delete(key);
-        successes.value = next;
-    }
+    const clearSuccess = (key: StatusKey) => {
+        Reflect.deleteProperty(successes.value, key);
+    };
 
-    function clearAll() {
-        loadingKeys.value = new Set();
-        errors.value = new Map();
-        successes.value = new Map();
-    }
+    const clearKey = (key: StatusKey) => {
+        cancelLoading(key);
+        Reflect.deleteProperty(errors.value, key);
+        Reflect.deleteProperty(successes.value, key);
+    };
+
+    const clearAll = () => {
+        loading.value = {};
+        errors.value = {};
+        successes.value = {};
+    };
 
     return {
+        loading,
+        errors,
+        successes,
+
         isAnyLoading,
-        loadingList,
         errorList,
         successList,
         latestError,
         latestSuccess,
 
-        isLoading,
         startLoading,
         stopLoading,
+        cancelLoading,
+        isLoading,
+        getError,
+        getSuccess,
         setError,
         clearError,
         clearAllErrors,
         setSuccess,
         clearSuccess,
+        clearKey,
         clearAll
     };
 });
